@@ -53,16 +53,16 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
    - Size: **Standard_D2ls_v7** (2 vCPUs, 4 GiB memory)
    - Username: `labuser`, with a password of my choice
 
-<img src="images/02a-dc1-basics.png" alt="DC-1 basics tab"/>
+<img src="images/02a-dc1-basics.jpg" alt="DC-1 basics tab"/>
 
 3. On the **Networking** tab, Azure creates a new virtual network (`vnet-eastus2-1`) and subnet (`snet-eastus2-1`, 172.16.0.0/24) for the lab. Click **Review + create**, then **Create**.
 
-<img src="images/02b-dc1-networking.png" alt="DC-1 networking tab"/>
+<img src="images/02b-dc1-networking.jpg" alt="DC-1 networking tab"/>
 
 4. When deployment finishes, open DC-1 and go to **Networking** > click the network interface > **IP configurations** > **ipconfig1**.
 5. Change the private IP allocation from **Dynamic** to **Static** and click **Save**. DC-1's private IP is `172.16.0.4`.
 
-<img src="images/02c-dc1-static-ip.png" alt="DC-1's private IP set to static"/>
+<img src="images/02c-dc1-static-ip.jpg" alt="DC-1's private IP set to static"/>
 
 *Why this matters:* every computer on the domain finds the domain controller by its IP address. If the address changed, logins would fail across the network.
 
@@ -76,9 +76,9 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
    - Size: **Standard_D2ls_v7**
    - Username: `labuser`, with the same password as DC-1
 
-<img src="images/03a-client1-basics.png" alt="Client-1 basics tab"/>
+<img src="images/03a-client1-basics.jpg" alt="Client-1 basics tab"/>
 
-<img src="images/03a2-client1-basics.png" alt="Client-1 size and administrator account"/>
+<img src="images/03a2-client1-basics.jpg" alt="Client-1 size and administrator account"/>
 
 2. On the **Networking** tab, select DC-1's virtual network **vnet-eastus2-1** and subnet **snet-eastus2-1**. Azure defaults to creating a new network here, so this has to be changed by hand (see the troubleshooting note in Step 6). Click **Review + create**, then **Create**.
 
@@ -87,7 +87,7 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 3. When deployment finishes, open Client-1 and go to **Networking** > click the network interface > **DNS servers**.
 4. Select **Custom**, enter DC-1's private IP `172.16.0.4`, and click **Save**.
 
-<img src="images/03b-client1-dns.png" alt="Client-1's DNS server set to DC-1"/>
+<img src="images/03b-client1-dns.jpg" alt="Client-1's DNS server set to DC-1"/>
 
 5. Restart Client-1 from the Azure portal so it picks up the new DNS setting.
 
@@ -98,16 +98,16 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 1. Copy DC-1's public IP address and connect to it with **Remote Desktop** as `labuser`.
 2. On DC-1, run `wf.msc` (Windows Defender Firewall with Advanced Security). Under **Inbound Rules**, enable both **Core Networking Diagnostics – ICMP Echo Request (ICMPv4-In)** rules so DC-1 answers ping requests.
 
-<img src="images/04a-dc1-icmp.png" alt="ICMPv4 rules enabled on DC-1"/>
+<img src="images/04a-dc1-icmp.jpg" alt="ICMPv4 rules enabled on DC-1"/>
 
 3. Connect to Client-1 with Remote Desktop and open Command Prompt.
 4. Run `ping 172.16.0.4`. The replies confirm Client-1 can reach DC-1.
 
-<img src="images/04b-ping-dc1.png" alt="Successful ping from Client-1 to DC-1"/>
+<img src="images/04b-ping-dc1.jpg" alt="Successful ping from Client-1 to DC-1"/>
 
 5. Run `ipconfig` to confirm Client-1 has its own address (`172.16.0.5`), then `nslookup mydomain.com` to confirm DC-1 answers DNS queries. (This screenshot was taken after Active Directory was installed in Step 4, which is when `mydomain.com` exists.)
 
-<img src="images/04c-ipconfig-dns.png" alt="ipconfig and nslookup on Client-1"/>
+<img src="images/04c-ipconfig-dns.jpg" alt="ipconfig and nslookup on Client-1"/>
 
 ### Step 4: Install Active Directory and promote DC-1
 
@@ -131,7 +131,7 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 6. Leave **Create DNS delegation** unchecked (there's no parent DNS zone in this lab), click **Next** through the remaining pages, and click **Install**. DC-1 restarts automatically. The first restart as a domain controller takes several minutes.
 7. Reconnect to DC-1 using the domain account `mydomain.com\labuser`. Running `whoami` confirms the login is now a domain account.
 
-<img src="images/05d-domain-login.png" alt="whoami showing mydomain\labuser"/>
+<img src="images/05d-domain-login.jpg" alt="whoami showing mydomain\labuser"/>
 
 *Why this matters:* this turns a regular server into the central system that controls who can log in and what they can access.
 
@@ -140,21 +140,21 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 1. Open **Active Directory Users and Computers** from Server Manager > **Tools**.
 2. Right-click `mydomain.com` > **New** > **Organizational Unit**. Create four OUs: `_EMPLOYEES`, `_ADMINS`, `_CLIENTS`, and `_GROUPS`.
 
-<img src="images/06a-create-ous.png" alt="The four new OUs in ADUC"/>
+<img src="images/06a-create-ous.jpg" alt="The four new OUs in ADUC"/>
 
 3. Right-click `_ADMINS` > **New** > **User**. Create **Jane Doe** with the logon name `jane_admin`. Because this is a lab, I unchecked **User must change password at next logon**.
 
-<img src="images/06b-create-jane.png" alt="Creating Jane Doe in the _ADMINS OU"/>
+<img src="images/06b-create-jane.jpg" alt="Creating Jane Doe in the _ADMINS OU"/>
 
 4. Right-click Jane Doe > **Properties** > **Member Of** > **Add**. Type `Domain Admins`, click **Check Names**, then **OK**, **Apply**, and **OK**.
 
-<img src="images/06c-domain-admins.png" alt="Jane Doe added to Domain Admins"/>
+<img src="images/06c-domain-admins.jpg" alt="Jane Doe added to Domain Admins"/>
 
 *Troubleshooting:* my first login as Jane failed with an error saying the account wasn't allowed to log in remotely. When I checked her **Member Of** tab, only Domain Users was listed, so the Domain Admins membership hadn't saved. I added it again and clicked **Apply** and **OK** before closing the window, and the login worked.
 
 5. Sign out of DC-1 and log back in as `mydomain.com\jane_admin`. I use this account for the rest of the lab.
 
-<img src="images/06d-jane-login.png" alt="whoami showing mydomain\jane_admin"/>
+<img src="images/06d-jane-login.jpg" alt="whoami showing mydomain\jane_admin"/>
 
 *Why this matters:* separating admins, employees, and computers into OUs lets you apply different policies to each, and using a named admin account instead of the built-in one makes admin activity easier to audit.
 
@@ -171,19 +171,13 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 
 - The join failed with an error saying a domain controller for the domain could not be contacted. The details showed that the DNS lookup for the domain controller's record had failed.
 
-<img src="images/07a2-domain-error.png" alt="Domain controller could not be contacted"/>
-
 - On Client-1, `ipconfig /all` showed the correct DNS server and `ping 172.16.0.4` got replies, but `nslookup mydomain.com` got no response from the server.
-
-<img src="images/07a3-dns-troubleshooting.png" alt="nslookup getting no response from DC-1"/>
 
 - On DC-1, the DNS service was running and answered queries locally, so I turned off the Windows Firewall on DC-1 to rule it out. Turning the firewall off is only acceptable because this is an isolated lab; in production I would open the required ports (DNS, Kerberos, LDAP) instead.
 
-<img src="images/04a2-dc1-firewall-off.png" alt="All firewall profiles turned off on DC-1"/>
+<img src="images/04a2-dc1-firewall-off.jpg" alt="All firewall profiles turned off on DC-1"/>
 
 - The join still failed. Running `Test-NetConnection 172.16.0.4 -Port 53` on Client-1 showed the source address was also `172.16.0.4`, meaning Client-1 had the same IP as DC-1. In Azure, Client-1's network interface was on **vnet-eastus2-2**, a second virtual network the VM wizard had created with the same address range. The two VMs were on separate networks, and Client-1's earlier pings had been answering itself.
-
-<img src="images/07a4-wrong-vnet.png" alt="Client-1 on the wrong virtual network"/>
 
 - **Fix:** Azure can't move an existing VM to a different virtual network, so I deleted Client-1 and the extra virtual network, then rebuilt Client-1 on **vnet-eastus2-1** (shown in Step 2). Client-1 then got its own address (`172.16.0.5`), `nslookup mydomain.com` returned DC-1, and the domain join succeeded.
 
@@ -197,7 +191,7 @@ This tutorial walks through deploying on-premises Active Directory inside Azure 
 2. Run `sysdm.cpl`, open the **Remote** tab, and click **Select Users**.
 3. Click **Add**, type `Domain Users`, click **Check Names**, then **OK**.
 
-<img src="images/08a-rdp-domain-users.png" alt="Domain Users allowed to use Remote Desktop"/>
+<img src="images/08a-rdp-domain-users.jpg" alt="Domain Users allowed to use Remote Desktop"/>
 
 *Why this matters:* by default only admins can log in remotely. This lets normal employee accounts sign in to Client-1, which I need to test the lockout policy in Step 11.
 
